@@ -24,7 +24,7 @@
      ┌────────▼───────┐ ┌───▼────┐ ┌───────▼──────┐
      │ Gemini 3.1     │ │ Google │ │  Firestore   │
      │ Flash Live     │ │  ADK   │ │ 15 collections│
-     │ (Voice WS)     │ │ 50+    │ │ 10 models    │
+     │ (Voice WS)     │ │ 49    │ │ 10 models    │
      │                │ │ tools  │ │              │
      └────────────────┘ └────────┘ └──────────────┘
               │                            │
@@ -47,13 +47,13 @@ Gemini 3.1 Flash Live (real-time audio streaming)
     │
     ├─── Audio input ($3.00/1M tokens)
     ├─── Audio output ($12.00/1M tokens)
-    ├─── Tool calls via ADK (50+ tools)
+    ├─── Tool calls via ADK (49 production tools (48 custom + Google Search))
     │       ├── read_medications()
     │       ├── confirm_medication_taken()
     │       ├── save_memory()    → Firestore
     │       ├── flag_for_caregiver() → FCM push
     │       ├── search_and_display() → Google Search
-    │       └── ... (50+ more)
+    │       └── ... (49 more)
     │
     ▼
 Audio response → WebSocket → Phone speaker

@@ -1,65 +1,90 @@
-# Devpost Submission — Text Description
+# Devpost Submission — Text Description (Track 1)
 
-> Copy this to the Devpost project page text description field.
+> Copy this to the Devpost project page text description fields.
 
 ---
 
-## Vita by Lucernas — AI Voice Companion for Elderly Latino Families
+## Project Name
 
-### Summary
+**Vita by Lucernas — Multimodal Multi-Agent Voice Presence for the Parents Who Raised Us**
 
-Vita is a production AI voice companion that talks to elderly Latino parents every day — in their language, at their pace — while their adult children monitor from the US and Europe. Built entirely on Google Cloud (Gemini 3.1 Flash Live, Agent Development Kit, Cloud Run, Firestore), Vita combines persistent memory, culturally-specific voice interaction, and a 3-portal family architecture into a platform that no generic AI assistant can replicate.
+## Track
 
-For this challenge (Track 3), we refactored Vita from a single-tenant consumer product into a multi-tenant, Marketplace-ready platform — enabling home care agencies across Latin America to deploy Vita for their clients through Google Cloud Marketplace.
+**Track 1: Build (Net-new Agents)**. The Vita agent is a net-new ADK + Gemini Live multi-modal multi-agent system. The `vita.lucernas.ai` marketing site predates the agent; the multi-agent platform this submission is being judged on is the production system that runs behind it.
 
-### The Problem
+## Problem to Solve
 
-68 million Hispanics live in the United States. 4.25 million Latin Americans live in Spain. Behind each of them is a parent aging alone in Latin America. 43% of adults 60+ report chronic loneliness (WHO) — with health impacts equal to smoking 15 cigarettes per day.
+43% of adults over 60 report chronic loneliness (WHO), with health impact equivalent to smoking 15 cigarettes a day. Millions of diaspora adults aged 30–50 have at least one parent over 65 living alone, sometimes thousands of miles away. They call on Sundays. They send money. They worry every day.
 
-12.3 million diaspora adults aged 30-50 have at least one parent over 65 living in Latin America. They call on Sundays, send money, and worry every day. Hiring a human companion costs $750-1,050/month. Generic AI doesn't understand "usted" vs "tú," doesn't know about faith routines, and doesn't remember mamá's stories.
+Generic AI assistants (Alexa, Google Home, ChatGPT) do not honor faith routines, do not speak neutral Latin American Spanish, do not remember mamá's stories, and do not watch what she shows the camera. A human in-home companion costs $750–$1,050 per month for daily presence and is out of reach for most families. The void is total.
 
-The market: 3.7-4.9 million families, $4.4-5.8 billion TAM. Zero products exist that combine voice AI + elder companionship + Latino cultural specificity + diaspora family architecture + neuroscience grounding.
+## Our Solution
 
-### What Vita Does
+Vita is a production multi-modal multi-agent voice presence that talks to elder parents every day, watches what they show the device camera, remembers their stories, observes their health, and bridges the family across borders.
 
-**For the elder (65-85):** Daily voice conversations in neutral Latin American Spanish. 50+ voice tools including medication reminders, Libro de Vida (life story preservation), gratitude journal, cognitive games, recipe guidance, fall risk assessment, and family calls. 6 voice modes: companion, cooking, mirror, medications, intro, and caregiver setup. Culturally specific: "usted" formality, regional accents, faith sensitivity.
+Built net-new on Gemini Enterprise Agent Platform. Three coordinated portals (elder voice, family caregiver dashboard, clinical nurse) share one Firestore back end and one Google ADK multi-agent orchestrator.
 
-**For the adult child (30-50, US/Europe):** Daily human summary — how mamá woke up, what she told Vita, what concerns her. 3-tier alerts (urgent/today/weekly). Medication adherence charts. Libro de Vida excerpts. Family coordination across siblings.
+### The agent system
 
-**For the nurse (Legado plan):** QR check-in, vital signs entry, photo uploads, real-time sync to caregiver dashboard.
+A root ADK orchestrator routes intent across 12 specialized sub-agents and 49 production tools (48 custom + Google Search grounding). Each voice turn may require recalling life-story memory, confirming a medication slot, evaluating an emotional dip for tier-2 alert routing, retrieving the latest blood-pressure trend, running Gemini Vision on the camera frame, and selecting the regional voice persona, all inside one Gemini Live socket while the elder is mid-sentence.
 
-### Technologies Used
+The 12 sub-agents: Companion (regional Spanish, register), Medication, Memory (Libro de Vida extraction), Mirror (Gemini Vision camera Q&A), Alert (3-tier escalation), Family messaging, Recipe, Voice cost metering, Session resumption, Persona variant, Clinical handoff, Onboarding.
 
-- **Gemini 3.1 Flash Live** — Voice engine (WebSocket, real-time audio streaming)
-- **Google Agent Development Kit (ADK)** — Agent framework for 50+ voice tools
-- **Gemini 3 Flash** — Memory extraction, session summaries, recipe generation
-- **Cloud Run** — Hosting (us-central1, auto-scaling 0-10)
-- **Firestore** — Database (15 collections, 10 data models)
-- **Google Cloud Storage** — Documents, photos, voice recordings
-- **Firebase Cloud Messaging** — Push notifications
-- **Gemini Vision** — Photo analysis for mirror mode
-- **Google Search API** — News, weather, nearby services for elders
+### Multi-modal capability (voice + vision + text in one socket)
 
-### Track 3 Refactor
+- **Voice:** Gemini 3.1 Flash Live via WebSocket, 6 production persona endpoints
+- **Vision:** Gemini Vision Flash for Mirror mode and nurse document parsing
+- **Text:** Gemini 3 Flash for memory extraction, summaries, recipe generation
 
-**Before:** Single-tenant consumer product with one Firestore prefix, hardcoded branding, direct Stripe billing.
+### Three coordinated portals
 
-**After:** Multi-tenant Marketplace-ready platform with agency organizations, isolated elder data, configurable branding, per-agency billing, Agency Admin Portal (5-100+ elders), and MCP connectors for EHR integration. Any home care agency can deploy Vita through Google Cloud Marketplace at $49/elder/month.
+- **Elder portal:** voice-first daily companion with Mirror mode and Libro de Vida capture
+- **Caregiver portal:** daily summary, 3-tier alerts, adherence charts, vital trends, document vault, family coordination
+- **Nurse portal:** 4-tier provider taxonomy, QR-coded clock-in, vital signs entry, real-time caregiver sync
 
-### Business Impact
+## Technologies Used
 
-- **TAM:** $4.4-5.8B (3.7-4.9M diaspora families across US + Spain)
-- **Unit economics:** Voice cost $0.008/min (validated). Infrastructure $10/user/month. Margins 63-86%.
-- **Revenue path:** 50 founding families → 450 Year 1 → Marketplace distribution Year 2
+- **Intelligence:** Gemini 3.1 Flash Live (voice WebSocket, 6 persona endpoints), Gemini 3 Flash (text intelligence), Gemini Vision Flash (Mirror mode + document parsing)
+- **Orchestration:** Google ADK — root agent + 12+ sub-agents + 49 production tools, ADK Sessions and Memory Bank, 88-file persona canon validated at boot
+- **Infrastructure:** Cloud Run (us-central1, autoscale 0→10), Cloud Build, Firestore (15+ collections + composite-index catalog), Cloud Storage (V4 signed PUT), Secret Manager, Cloud Logging (structured tool-call traces), IAM with service-account federation
+- **Grounding and Retrieval:** Google Search via Gemini Live tools, persistent per-elder RAG against 88-file persona canon and 15+ Firestore collections
+- **Backend:** Python 3.12 + FastAPI + uvicorn, google-genai SDK, google-adk SDK, Pydantic v2, bcrypt, JWT auth with password-version revocation
+- **Frontend:** React 18 + Vite + TypeScript, Liquid Glass design system, ESLint react-hooks rules in pre-deploy gate, ErrorBoundary with server-log integration
+- **CI/CD:** Hard-fail pre-deploy gates (lint + Firestore index diff + voice-safety preflight), daily deploy cadence
 
-### Findings & Learnings
+## Data Sources
 
-1. **Context re-billing is the hidden cost of voice AI.** Gemini Live re-bills all previous turns each turn. Our 2-Session Architecture reduces costs by 49%.
+- **Per-elder data** (Firestore, 15+ collections): elder profile, medications and adherence log, vital signs time-series, Libro de Vida memory store (categorized story / family / preference / routine / emotion / health), family graph, voice sessions with mood scores and tool-call audit, nurse visits, 3-tier alerts, appointments, routines, activities, documents
+- **Knowledge base RAG:** 88-file authored persona canon (voice rules, regional accents, register, refusal patterns, cultural fragments) validated at agent boot
+- **Document vault** (Cloud Storage): elder photos, nurse CV uploads, medical documents with 5-category retention schema
+- **External real-time:** Google Search via Gemini Live for current events, YouTube Data API v3 for music and video, OpenWeather for localized weather, GNews for regional news
 
-2. **Cultural specificity beats general capability.** Colombian diminutives end in '-ico' (not '-ito'). These invisible details are why elders engage daily with Vita and ignore Alexa.
+## Findings and Learnings
 
-3. **The buyer and user are different people.** The child in Dallas pays. The mother in Bogotá talks to Vita. Designing for this split is fundamentally different from single-user SaaS.
+**Observability comes first.** `logger.info` traces across the multi-agent system were silently dropped because `LOG_LEVEL=INFO` was set in `deploy.sh` but never read by code. Once `basicConfig` and per-logger `setLevel` landed, a 90-minute production bug was diagnosed in 5 minutes from logs.
 
-4. **ADK + Gemini Live is production-ready for voice agents.** 50+ tools via ADK with Gemini 3.1 Flash Live on WebSocket. The combination works at production scale.
+**Voice config is the fragile surface.** `LiveConnectConfig` drift, `GOOGLE_GENAI_USE_VERTEXAI` ordering, `send_client_content` incompatibility with tool-enabled endpoints, model-name typos: each cost hours. Every voice change is now one-at-a-time with documented preflight.
 
-5. **Multi-tenant refactoring for Marketplace requires agency-level data isolation** — not just user-level. This was the core Track 3 engineering challenge.
+**Shared budget is not fallback.** Our `google_search` tool shared an 18-second budget across two Gemini models; the slower primary consumed all of it before timing out, so the fallback never ran. Fix: reverse order, bump budget, reserve fallback guard.
+
+**Cultural register is the moat, not the LLM.** Usted vs tú, faith routines, regional Spanish, the silence between turns. Generic LLMs cannot ship this without an authored 88-file persona canon validated at boot. The "would mama say this to her son at 11pm" gate is the actual quality bar.
+
+## Third-Party Integrations
+
+- **Stripe** for subscription billing (test mode during invite phase, production-key rotation pending)
+- **YouTube Data API v3** for music and video display with title-rewrite filtering (our API key)
+- **OpenWeather API** for localized weather (our key)
+- **GNews API** for regional news (our key)
+- **Gmail SMTP** for caregiver alert delivery
+- **Phosphor Icons** (open-source, MIT license)
+
+All third-party integrations respect provider Terms of Service. No scraped content, no synthetic personas, no fabricated testimonials.
+
+## Live Demo Credentials
+
+Available to judges:
+
+- **Live URL:** [https://vita.lucernas.ai](https://vita.lucernas.ai)
+- **Caregiver:** `calagumo@yahoo.com` / `VitaDemo2026!` → `/app/caregiver`
+- **Nurse:** `enfermera.vita@lucernas.ai` / `VitaDemo2026!` → `/app/nurse`
+- **Seeded elder:** Doña Aurora Aguirre, 73, Bucaramanga, hypertension + diabetes type 2, 45 days of history (medications, nurse visits, voice sessions, memories)

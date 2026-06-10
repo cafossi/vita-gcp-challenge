@@ -1,4 +1,4 @@
-# Vita Voice Agent — Tool Catalog (50+ Tools)
+# Vita Voice Agent — Tool Catalog (49 Tools)
 
 > These tools are registered with Google ADK and available during Gemini 3.1 Flash Live voice sessions.
 

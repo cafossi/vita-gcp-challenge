@@ -1,185 +1,192 @@
-# Vita by Lucernas — Google for Startups AI Agents Challenge
+# Vita by Lucernas — Google for Startups AI Agents Challenge 2026
 
-> Track 3: Refactor for Google Cloud Marketplace & Gemini Enterprise
-> Team: Carlos Guzmán (Founder & CEO) + Valerie Guzmán (Co-Founder & Head of Science)
-> Live: [vita.lucernas.ai](https://vita.lucernas.ai)
+> **Track 1: Build (Net-new Agents)** · Submitted by Lucernas.AI
+> Live: [vita.lucernas.ai](https://vita.lucernas.ai) · Email: [valerie@lucernas.ai](mailto:valerie@lucernas.ai)
 
 ---
 
 ## What is Vita?
 
-Vita is an AI voice companion that talks to elderly Latino parents every day — in their language, at their pace — while their adult children monitor from the US and Europe.
+Vita is a production multi-modal multi-agent **voice presence** for the parents who raised us. Not a chatbot. A daily companion that sees, listens, remembers, and stays.
 
-**The problem:** 43% of adults 60+ report chronic loneliness (WHO) — with health impacts equal to smoking 15 cigarettes per day. 12.3 million diaspora adults in the US and Spain have at least one parent over 65 living alone in Latin America. They call on Sundays. They send money. They worry every day.
+Built net-new on **Google Agent Development Kit + Gemini Live + Cloud Run + Firestore**, Vita coordinates 12+ specialized sub-agents across three portals (elder, family caregiver, clinical nurse) on one Firestore back end. Real elder, caregiver, and nurse sessions live today in production.
 
-**The solution:** Vita speaks neutral Latin American Spanish, remembers mamá's stories in a Libro de Vida, reminds her about medications with warmth (not alarms), and sends her children a daily summary: how she woke up, what she told Vita, what's worrying her, when to call.
+**The problem.** 43% of adults over 60 report chronic loneliness (WHO) with health impact equivalent to smoking 15 cigarettes per day. Millions of diaspora adults have a parent over 65 living alone, sometimes thousands of miles away. They call on Sundays. They send money. They worry every day. Generic AI assistants don't remember mamá's stories, don't honor faith routines, don't watch for the medication she missed, and don't tell her son when something feels off.
 
-Not a nurse. Not a doctor. The presence between your Sunday calls.
+**The solution.** A multimodal presence that talks to her every day, watches what she shows the camera, remembers her stories, observes her health, and bridges the family across borders. Vita stays so the family can sleep at night.
+
+**Companion, never clinician.** Vita does not make medical or cognitive outcome claims.
 
 ---
 
 ## Architecture
 
-Built entirely on Google Cloud:
+Built on Google Cloud, end-to-end:
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                  Google Cloud Platform                 │
-│                                                       │
-│  ┌─────────────┐    ┌──────────────┐    ┌──────────┐ │
-│  │ Gemini 3.1  │    │  Google ADK  │    │ Firestore│ │
-│  │ Flash Live  │◄──►│  (Agents)    │◄──►│ (15 cols)│ │
-│  │ (Voice WS)  │    │  50+ tools   │    │          │ │
-│  └──────┬──────┘    └──────┬───────┘    └────┬─────┘ │
-│         │                  │                  │       │
-│  ┌──────▼──────────────────▼──────────────────▼─────┐│
-│  │              Cloud Run (FastAPI)                   ││
-│  │  20 API router groups · 125+ endpoints            ││
-│  │  4 WebSocket voice endpoints                      ││
-│  │  Multi-tenant middleware · Agency isolation        ││
-│  └──────────────────────┬────────────────────────────┘│
-│                         │                              │
-│  ┌──────────────────────▼────────────────────────────┐│
-│  │              React 18 SPA (Vite + TS)             ││
-│  │  Elder Portal · Caregiver Dashboard · Nurse App   ││
-│  │  Agency Admin · Command Center · Demo System      ││
-│  └───────────────────────────────────────────────────┘│
-│                                                       │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐ │
-│  │   GCS   │  │   FCM   │  │ Vision  │  │ Search  │ │
-│  │ Storage │  │  Push   │  │ (Gemini)│  │  API    │ │
-│  └─────────┘  └─────────┘  └─────────┘  └─────────┘ │
-│                                                       │
-│  ┌───────────────────────────────────────────────────┐│
-│  │         Google Cloud Marketplace (Track 3)        ││
-│  │  Agency Pro: $49/elder/mo · White-label · MCP     ││
-│  └───────────────────────────────────────────────────┘│
-└──────────────────────────────────────────────────────┘
+                       ┌─────────────────┐
+                       │   Elder (65-85) │
+                       │  Phone / Tablet │
+                       └────────┬────────┘
+                                │
+                          WebSocket (voice)
+                          HTTPS (app)
+                                │
+                       ┌────────▼────────────┐
+                       │  Cloud Run          │
+                       │  vita-advisor       │
+                       │  us-central1, 0→10  │
+                       └────────┬────────────┘
+                                │
+        ┌───────────────────────┼────────────────────────┐
+        │                       │                        │
+┌───────▼─────────┐    ┌────────▼─────────┐    ┌────────▼─────────┐
+│  Gemini 3.1     │    │  Google ADK      │    │   Firestore      │
+│  Flash Live     │    │  Multi-agent     │    │   15+ collections│
+│  (Voice WS,     │    │  Root + 12 sub-  │    │   10+ Pydantic   │
+│   6 endpoints)  │    │  agents, 49 tools│    │   models         │
+└───────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘
+        │                       │                        │
+┌───────▼─────────┐    ┌────────▼─────────┐    ┌────────▼─────────┐
+│  Gemini Vision  │    │  Google Search   │    │   Cloud Storage  │
+│  Mirror mode    │    │  grounding tool  │    │   docs / photos  │
+│  Doc parsing    │    │                  │    │   V4 signed PUT  │
+└─────────────────┘    └──────────────────┘    └──────────────────┘
+
+      Three coordinated portals on one back end:
+      Elder voice (React) · Caregiver dashboard · Nurse portal
 ```
 
-| Component | Technology |
-|-----------|-----------|
-| Voice Engine | Gemini 3.1 Flash Live (WebSocket, real-time audio) |
-| Agent Framework | Google Agent Development Kit (ADK) |
-| Text Intelligence | Gemini 3 Flash (memory extraction, summaries) |
-| Hosting | Cloud Run (us-central1, auto-scaling 0-10) |
-| Database | Firestore (15 collections, 10 data models) |
-| Storage | Google Cloud Storage |
-| Push | Firebase Cloud Messaging (FCM) |
-| Vision | Gemini Vision (mirror mode photo analysis) |
-| Search | Google Search API (news, weather for elders) |
+| Layer | Technology |
+|---|---|
+| Voice intelligence | **Gemini 3.1 Flash Live** (WebSocket, native audio streaming, tool calling in-turn) |
+| Multi-agent orchestration | **Google Agent Development Kit (ADK)** — root + 12+ sub-agents |
+| Text intelligence | **Gemini 3 Flash** (memory extraction, daily summaries, recipe generation) |
+| Vision | **Gemini Vision Flash** (elder Mirror mode, nurse document parsing) |
+| Compute | **Cloud Run** us-central1, autoscale 0→10, 4 GiB / 2 vCPU |
+| Persistence | **Firestore** — 15+ production collections + composite-index catalog |
+| Storage | **Cloud Storage** — V4 signed PUT with content-length-range |
+| Build + CI | **Cloud Build** — multi-stage Docker, hard-fail pre-deploy gates |
+| Observability | **Cloud Logging** structured tool-call traces per session |
+| Secrets | **Secret Manager** + Cloud Run service-identity bindings |
+| Grounding | **Google Search via Gemini Live tools** + 88-file persona canon RAG |
 | Payments | Stripe |
+| Frontend | React 18 + Vite + TypeScript SPA |
 
 ---
 
-## Three Portals
+## Multi-agent topology
 
-| Portal | User | Purpose |
-|--------|------|---------|
-| **Elder App** (El Corazón) | Mamá/Papá (65-85) | Voice companion, medication reminders, Libro de Vida, daily check-in |
-| **Caregiver App** (La Tranquilidad) | Adult child (30-50, US/EU) | Daily summary, 3-tier alerts, medication adherence, family coordination |
-| **Nurse App** (El Escudo) | Home nurse | QR check-in, vital signs, photo uploads, shift reports |
+The system is multi-agent because no single LLM call can stitch memory + medication + voice cost + cultural register + alert routing + vision + grounding into one coherent conversation while emitting a caregiver-readable audit trail.
 
----
+**A root ADK orchestrator routes intent across 12 specialized sub-agents:**
 
-## 50+ Voice Agent Tools
+| Sub-agent | Owns |
+|---|---|
+| **Companion** | Daily voice conversation, regional accent, register selection, faith-aware silence |
+| **Medication** | Adherence confirmation by voice, schedule reasoning, missed-dose escalation |
+| **Memory** (Libro de Vida) | Continuous categorized fact extraction (story / family / preference / routine / emotion / health) |
+| **Mirror** | Gemini Vision Q&A on the elder device camera (photos, meds, plants, family albums) |
+| **Alert** | 3-tier escalation routing (urgent / today / weekly) with caregiver notification |
+| **Family** | Outbound message orchestration to siblings, grandchildren, the diaspora buyer |
+| **Recipe** | Culturally grounded meal guidance with familiar regional dishes |
+| **Voice cost** | Per-session budget tracking + throttling for cost transparency |
+| **Session resumption** | Long-context persistence across multi-day conversations |
+| **Persona variant** | Selects accent + register from the 88-file canon based on elder region |
+| **Clinical handoff** | Generates redacted health summary for the nurse portal + caregiver |
+| **Onboarding** | Caregiver-led elder onboarding with no-form intelligent capture |
 
-Vita's voice agent runs on Gemini 3.1 Flash Live via WebSocket with 50+ registered tools through Google ADK:
-
-**Health & Safety:** medication reminders with confirmation, mood tracking (1-5), pain logging, sleep journal, hydration tracker, fall risk assessment, medication interaction check, doctor visit debrief, silent caregiver alerts (3 tiers)
-
-**Memory & Stories:** Libro de Vida (life story preservation with era tags), family tree builder, gratitude journal, worry jar, memory extraction from voice sessions
-
-**Daily Life:** today's tasks, weather, bill reminders, visitor log, grocery list, food ordering, recipe search + step-by-step cooking mode
-
-**Family Connection:** call family (phone/WhatsApp/FaceTime), photo sharing with captions, virtual window (describe family member's day in another city)
-
-**Enrichment:** music/video search + playback, read aloud (news, Bible, poems, jokes), cognitive games, guided meditation, UI atmosphere control
-
----
-
-## Track 3 Refactor: From Consumer to Marketplace
-
-### Before (single-tenant)
-- One Firestore prefix per deployment
-- Hardcoded branding
-- Single billing entity
-
-### After (multi-tenant, Marketplace-ready)
-- **Agency organizations** with isolated elder data, configurable branding, per-agency billing
-- **Agency Admin Portal** to manage 5-100+ elders, aggregate health metrics, voice persona config
-- **Per-elder billing** ($49/elder/month) through Marketplace procurement
-- **MCP connectors** for external EHR system integration
-
-See `marketplace/` for the Marketplace listing configuration and `src/` for the multi-tenant refactor code.
+The orchestrator stitches their outputs into one voice response in under 2 seconds. See [`architecture/ARCHITECTURE.md`](architecture/ARCHITECTURE.md) for the detailed pipeline.
 
 ---
 
-## Business Impact
+## 49 production agent tools
 
-| Metric | Value |
-|--------|-------|
-| TAM | $4.4-5.8B (3.7-4.9M diaspora families) |
-| Voice cost | $0.008/min (Gemini 3.1 Flash Live, validated) |
-| Infrastructure | ~$10/user/month |
-| Gross margins | 63-86% across 4 tiers |
-| Pricing | $39-199/month (consumer), $49/elder/month (agency) |
+The voice agent is registered with **48 custom ADK tools + Google Search grounding** (49 total). They are organized into:
 
----
+- **User context & retrieval** (7 tools): full elder profile, meds, appointments, memories, time
+- **Health & safety** (12 tools): mood, pain, hydration, sleep journal, fall-risk, medication-interaction, doctor-visit debrief, silent caregiver alerts
+- **Memory & stories** (5 tools): Libro de Vida, family tree, gratitude journal, worry jar, life-story write
+- **Daily life** (10 tools): today's tasks, weather, bill reminders, visitor log, grocery list, food order, recipe search + cooking mode
+- **Family connection** (3 tools): call family, photo share with captions, virtual window
+- **Enrichment** (8 tools): music + video search and playback, read aloud, cognitive games, guided meditation, UI atmosphere control, display cards
+- **Search grounding** (1): Google Search via Gemini Live tools
 
-## Science Foundation
-
-Vita is grounded in four research areas, led by Valerie Guzmán (Neuroscience & Cognitive Science, University of Connecticut):
-
-1. **Loneliness intervention** — Chronic loneliness = 15 cigarettes/day health impact. Only intervention with evidence: meaningful, repeated contact.
-2. **Reminiscence therapy** — Studied since 1963 (Dr. Robert Butler). Measurable effects on depression. Libro de Vida is a structured intervention.
-3. **Voice as biomarker** — Voice contains signals of cognitive/emotional wellbeing. Record with consent, observe changes, never diagnose.
-4. **Transnational family care** — Love doesn't erase with distance, but presence distorts. Vita is designed for that reality.
+Full catalog: [`src/tools/voice_tools_catalog.md`](src/tools/voice_tools_catalog.md).
 
 ---
 
-## The Founders
+## Three coordinated portals
 
-**Carlos Guzmán** — Founder & CEO. 20+ years: aerospace → AI. MBA UT Dallas. Harvard Business Analytics. His mamá, Doña Teresa, lives alone in Cúcuta, Colombia. Vita was born from wanting someone to be there when he couldn't.
-
-**Valerie Guzmán** — Co-Founder & Head of Science. Neuroscience & Cognitive Science at UConn. Pre-med. Designed Vita's 4-pillar research program. Carlos's daughter, Doña Teresa's granddaughter.
+| Portal | User | Surface |
+|---|---|---|
+| **Elder** | The parent (65-85) | Voice companion · Mirror mode camera Q&A · Libro de Vida · medication confirmation · cognitive games |
+| **Caregiver** | Adult child (30-50) | Daily human-readable summary · 3-tier alerts · medication adherence charts · vital trends · Libro de Vida excerpts · family coordination · document vault |
+| **Nurse** | Clinical home-care provider | 4-tier provider taxonomy · Path A self-signup + Path B invite-code · QR-coded clock-in/out · vital signs entry · photo upload · caregiver real-time sync |
 
 ---
 
-## Repository Structure
+## Live demo for judges
+
+| | |
+|---|---|
+| Live URL | [https://vita.lucernas.ai](https://vita.lucernas.ai) |
+| Caregiver login | `calagumo@yahoo.com` / `VitaDemo2026!` → [/app/caregiver](https://vita.lucernas.ai/app/caregiver) |
+| Nurse login | `enfermera.vita@lucernas.ai` / `VitaDemo2026!` → [/app/nurse](https://vita.lucernas.ai/app/nurse) |
+| Seeded elder | Doña Aurora Aguirre · 73 · Bucaramanga · HTA + Diabetes T2 · 45 days of medication adherence, nurse visits, voice sessions, Libro de Vida memories |
+
+Hard-refresh after first load. The seed accounts are real Firestore docs, not mocks.
+
+---
+
+## Production observability + safety
+
+- **Structured Cloud Logging tool-call traces** per session (`[sid] Tool call: {fc.name}({args})` + `Tool result`)
+- **Hard-fail pre-deploy gates** in `deploy.sh`:
+  - L2: ESLint `react-hooks/rules-of-hooks` + `no-unsafe-optional-chaining`
+  - L4: Firestore composite-index catalog coverage diff
+  - Voice-safety preflight (`validate_persona` import-time check, `GOOGLE_GENAI_USE_VERTEXAI=0` ordering, `send_client_content` count check)
+- **Paired QA + Performance methodologies** with class-of-bug lesson library that promotes lessons to hard rules after 3 sibling findings
+- **Client ErrorBoundary** posts every render crash to `/api/_debug/render_error` for forensic trail
+- **88-file persona canon** validated at agent boot
+
+---
+
+## What's in this repo
 
 ```
-vita-gcp-challenge/
-├── README.md                  ← This file
-├── docs/
-│   ├── SUBMISSION.md          ← Devpost text description
-│   ├── FINDINGS.md            ← Technical findings & learnings
-│   └── TRACK3_REFACTOR.md     ← Track 3 refactor specification
+.
+├── README.md                          ← This file
+├── SECURITY.md                        ← Posture + vulnerability disclosure
 ├── architecture/
-│   └── ARCHITECTURE.md        ← Full technical architecture
-├── src/
-│   ├── routes/                ← Sanitized API route examples
-│   ├── services/              ← Sanitized service layer examples
-│   ├── models/                ← Data model definitions
-│   └── tools/                 ← Voice agent tool definitions
-├── frontend-preview/          ← Screenshots of the 3 portals
-└── marketplace/               ← GCP Marketplace listing config
+│   └── ARCHITECTURE.md                ← Detailed system + voice pipeline
+├── docs/
+│   ├── SUBMISSION.md                  ← Devpost-format submission text
+│   └── FINDINGS.md                    ← Engineering insights from building this
+└── src/
+    ├── models/
+    │   └── schema.py                  ← Pydantic models (sanitized)
+    ├── routes/
+    │   └── api_routes_overview.md     ← API surface map
+    └── tools/
+        └── voice_tools_catalog.md     ← All 49 tools
 ```
 
-> **Note:** This is a submission-only repository. The full production codebase is private. Code samples here demonstrate the architecture and Track 3 refactor without exposing operational secrets, persona prompts, or customer data.
+**Not in this repo (intentionally):** the 88-file persona canon (voice rules, regional accent fragments, refusal patterns, faith-aware silence rules); production prompts; secret API keys; demo seed cultural content; competitive analysis; tier internals. The production codebase and canon stay private. This repo shows the architecture and structure that judges need to evaluate, with enough detail to verify the system is real and the multi-agent orchestration is substantive.
 
 ---
 
-## Demo
+## Team
 
-Live: [vita.lucernas.ai](https://vita.lucernas.ai)
+**Lucernas.AI** — founder-led pre-seed.
 
-Demo video: [YouTube link TBD]
+- **Carlos Guzman** (Co-Founder) — engineering and product
+- **Valerie Guzman** (Co-Founder, Head of Science) — neuroscience grounding and persona authorship
 
 ---
 
-## Contact
+## License
 
-- Carlos Guzmán — carlos@lucernas.ai
-- Valerie Guzmán — valerie@lucernas.ai
-- Website — [lucernas.ai](https://lucernas.ai)
+This repository is published under the MIT License for the purposes of the Google for Startups AI Agents Challenge 2026 judging. The production Vita codebase, persona canon, and operational data remain proprietary to Lucernas.AI.
+
+The Vita name, logo, and branding are trademarks of Lucernas.AI.
