@@ -21,41 +21,9 @@ Built net-new on **Google Agent Development Kit + Gemini Live + Cloud Run + Fire
 
 ## Architecture
 
-Built on Google Cloud, end-to-end:
+![Vita system architecture](./architecture/system_diagram.png)
 
-```
-                       ┌─────────────────┐
-                       │   Elder (65-85) │
-                       │  Phone / Tablet │
-                       └────────┬────────┘
-                                │
-                          WebSocket (voice)
-                          HTTPS (app)
-                                │
-                       ┌────────▼────────────┐
-                       │  Cloud Run          │
-                       │  vita-advisor       │
-                       │  us-central1, 0→10  │
-                       └────────┬────────────┘
-                                │
-        ┌───────────────────────┼────────────────────────┐
-        │                       │                        │
-┌───────▼─────────┐    ┌────────▼─────────┐    ┌────────▼─────────┐
-│  Gemini 3.1     │    │  Google ADK      │    │   Firestore      │
-│  Flash Live     │    │  Multi-agent     │    │   15+ collections│
-│  (Voice WS,     │    │  Root + 12 sub-  │    │   10+ Pydantic   │
-│   6 endpoints)  │    │  agents, 49 tools│    │   models         │
-└───────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘
-        │                       │                        │
-┌───────▼─────────┐    ┌────────▼─────────┐    ┌────────▼─────────┐
-│  Gemini Vision  │    │  Google Search   │    │   Cloud Storage  │
-│  Mirror mode    │    │  grounding tool  │    │   docs / photos  │
-│  Doc parsing    │    │                  │    │   V4 signed PUT  │
-└─────────────────┘    └──────────────────┘    └──────────────────┘
-
-      Three coordinated portals on one back end:
-      Elder voice (React) · Caregiver dashboard · Nurse portal
-```
+Built on Google Cloud, end-to-end. Source: [`architecture/system_diagram.html`](./architecture/system_diagram.html). Detailed pipeline: [`architecture/ARCHITECTURE.md`](./architecture/ARCHITECTURE.md).
 
 | Layer | Technology |
 |---|---|

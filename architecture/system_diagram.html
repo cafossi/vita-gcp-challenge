@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vita — Architecture Diagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --terracotta: #C85A2E;
+    --terracotta-soft: #E89880;
+    --cream: #F4E6D2;
+    --card-cream: #FBF2E1;
+    --ink: #2A1410;
+    --soft-ink: #4A2820;
+    --sage: #4F7968;
+    --sage-soft: #9DBDB1;
+    --indigo: #5B437A;
+    --serif-italic: 'Instrument Serif', 'Fraunces', Georgia, serif;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'DM Sans', 'Inter', system-ui, sans-serif;
+  }
+  html, body { margin: 0; padding: 0; background: #000; }
+  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .canvas {
+    width: 1600px;
+    height: 1000px;
+    position: relative;
+    background:
+      radial-gradient(circle at 82% 8%, rgba(200,90,46,0.10) 0%, transparent 50%),
+      radial-gradient(circle at 18% 92%, rgba(79,121,104,0.10) 0%, transparent 50%),
+      linear-gradient(135deg, #F4E6D2 0%, #FBF2E1 60%, #F4E6D2 100%);
+    overflow: hidden;
+    font-family: var(--body);
+    color: var(--ink);
+  }
+
+  /* Header */
+  .header {
+    position: absolute;
+    top: 36px;
+    left: 64px;
+    right: 64px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .wordmark {
+    font-family: var(--serif-italic);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--terracotta);
+    letter-spacing: -0.012em;
+  }
+  .wordmark .by {
+    font-family: var(--body);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--soft-ink);
+    margin-left: 12px;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+  }
+  .header-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 28px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    text-align: right;
+  }
+  .header-title .small {
+    display: block;
+    font-family: var(--body);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--soft-ink);
+    opacity: 0.7;
+    margin-bottom: 2px;
+  }
+
+  /* Boxes */
+  .box {
+    position: absolute;
+    background: #ffffff;
+    border: 1.5px solid rgba(42,20,16,0.10);
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(42,20,16,0.07);
+    font-family: var(--body);
+  }
+  .box.brand {
+    background: linear-gradient(135deg, #ffffff 0%, #FFF1E5 100%);
+    border-color: rgba(200,90,46,0.30);
+    box-shadow: 0 8px 28px rgba(200,90,46,0.18);
+  }
+  .box.brand-strong {
+    background: linear-gradient(135deg, var(--terracotta) 0%, #B04E26 100%);
+    border-color: var(--terracotta);
+    color: #ffffff;
+    box-shadow: 0 10px 32px rgba(200,90,46,0.34);
+  }
+  .box.sage {
+    background: linear-gradient(135deg, #ffffff 0%, #E8F2EE 100%);
+    border-color: rgba(79,121,104,0.30);
+    box-shadow: 0 6px 20px rgba(79,121,104,0.18);
+  }
+  .box.indigo {
+    background: linear-gradient(135deg, #ffffff 0%, #EEEAF3 100%);
+    border-color: rgba(91,67,122,0.30);
+    box-shadow: 0 6px 20px rgba(91,67,122,0.18);
+  }
+
+  .label {
+    font-family: var(--body);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--soft-ink);
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .box.brand-strong .label { color: rgba(255,255,255,0.7); opacity: 1; }
+
+  .title {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 19px;
+    line-height: 1.1;
+    color: var(--ink);
+    letter-spacing: -0.012em;
+  }
+  .box.brand-strong .title { color: #ffffff; }
+  .box.sage .title { color: var(--sage); }
+  .box.indigo .title { color: var(--indigo); }
+  .box.brand .title { color: var(--terracotta); }
+
+  .meta {
+    font-family: var(--body);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--soft-ink);
+    margin-top: 5px;
+  }
+  .box.brand-strong .meta { color: rgba(255,255,255,0.86); }
+
+  .pillrow {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 7px;
+  }
+  .pillrow .pill {
+    font-size: 10.5px;
+    font-weight: 600;
+    background: rgba(42,20,16,0.06);
+    color: var(--soft-ink);
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+  }
+  .box.brand-strong .pillrow .pill {
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+  }
+
+  /* Footer caption */
+  .footer {
+    position: absolute;
+    bottom: 28px;
+    left: 64px;
+    right: 64px;
+    font-family: var(--body);
+    font-size: 12.5px;
+    color: var(--soft-ink);
+    letter-spacing: 0.02em;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .footer .legend {
+    display: inline-flex;
+    gap: 18px;
+    align-items: center;
+  }
+  .footer .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--soft-ink);
+    opacity: 0.78;
+  }
+  .footer .legend-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .footer .right {
+    font-family: var(--serif-italic);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--terracotta);
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="wordmark">Vita<span class="by">by Lucernas.AI</span></div>
+    <div class="header-title">
+      <span class="small">Production Architecture · Google for Startups AI Agents Challenge 2026 · Track 1</span>
+      <em>Multi-modal multi-agent voice presence.</em>
+    </div>
+  </div>
+
+  <!-- SVG layer for connectors (under boxes) -->
+  <svg viewBox="0 0 1600 1000" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#C85A2E" opacity="0.85"/>
+      </marker>
+      <marker id="arrow-sage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#4F7968" opacity="0.85"/>
+      </marker>
+      <marker id="arrow-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#5B437A" opacity="0.85"/>
+      </marker>
+    </defs>
+
+    <!-- Lines from 3 portals → Cloud Run -->
+    <path d="M 220 280 Q 260 340 540 380" stroke="#C85A2E" stroke-width="2.2" fill="none" opacity="0.55" stroke-dasharray="0" marker-end="url(#arrow)"/>
+    <path d="M 760 280 L 760 380" stroke="#C85A2E" stroke-width="2.2" fill="none" opacity="0.55" marker-end="url(#arrow)"/>
+    <path d="M 1300 280 Q 1260 340 1000 380" stroke="#C85A2E" stroke-width="2.2" fill="none" opacity="0.55" marker-end="url(#arrow)"/>
+
+    <!-- Cloud Run → ADK (center, large) -->
+    <path d="M 760 480 L 760 545" stroke="#C85A2E" stroke-width="2.5" fill="none" opacity="0.7" marker-end="url(#arrow)"/>
+
+    <!-- ADK → 3 intelligences (Gemini Live, Gemini Flash, Vision) -->
+    <path d="M 600 660 L 350 720" stroke="#C85A2E" stroke-width="2" fill="none" opacity="0.55" marker-end="url(#arrow)"/>
+    <path d="M 760 700 L 760 720" stroke="#C85A2E" stroke-width="2" fill="none" opacity="0.55" marker-end="url(#arrow)"/>
+    <path d="M 920 660 L 1170 720" stroke="#C85A2E" stroke-width="2" fill="none" opacity="0.55" marker-end="url(#arrow)"/>
+
+    <!-- ADK → Firestore (right) -->
+    <path d="M 920 600 L 1280 600" stroke="#4F7968" stroke-width="2.2" fill="none" opacity="0.55" marker-end="url(#arrow-sage)"/>
+
+    <!-- ADK → Cloud Storage (left) -->
+    <path d="M 600 600 L 240 600" stroke="#4F7968" stroke-width="2.2" fill="none" opacity="0.55" marker-end="url(#arrow-sage)"/>
+
+    <!-- ADK → Google Search (down-left, smaller) -->
+    <path d="M 700 700 Q 500 760 380 870" stroke="#5B437A" stroke-width="1.8" fill="none" opacity="0.55" stroke-dasharray="4 4" marker-end="url(#arrow-indigo)"/>
+
+    <!-- ADK → Cloud Logging (down-right) -->
+    <path d="M 820 700 Q 1000 760 1220 870" stroke="#5B437A" stroke-width="1.8" fill="none" opacity="0.55" stroke-dasharray="4 4" marker-end="url(#arrow-indigo)"/>
+  </svg>
+
+  <!-- 3 Portals row -->
+  <div class="box" style="top: 150px; left: 100px; width: 240px;">
+    <div class="label">Portal · React 18 SPA</div>
+    <div class="title">Elder</div>
+    <div class="meta">Voice-first daily companion. Mirror mode camera Q&amp;A. Libro de Vida capture.</div>
+    <div class="pillrow">
+      <span class="pill">WebSocket voice</span>
+      <span class="pill">HTTPS</span>
+    </div>
+  </div>
+
+  <div class="box" style="top: 150px; left: 640px; width: 240px;">
+    <div class="label">Portal · React 18 SPA</div>
+    <div class="title">Caregiver</div>
+    <div class="meta">Daily summary. 3-tier alerts. Adherence charts. Memory excerpts. Family coordination.</div>
+    <div class="pillrow">
+      <span class="pill">HTTPS</span>
+      <span class="pill">FCM push</span>
+    </div>
+  </div>
+
+  <div class="box" style="top: 150px; left: 1180px; width: 240px;">
+    <div class="label">Portal · React 18 SPA</div>
+    <div class="title">Nurse</div>
+    <div class="meta">QR clock-in / out. Vitals entry. Photo upload. Real-time caregiver sync.</div>
+    <div class="pillrow">
+      <span class="pill">HTTPS</span>
+      <span class="pill">4-tier credentials</span>
+    </div>
+  </div>
+
+  <!-- Cloud Run (gateway) -->
+  <div class="box brand" style="top: 380px; left: 530px; width: 460px; padding: 18px 24px;">
+    <div class="label">Compute · Gateway</div>
+    <div class="title">Cloud Run · vita-advisor</div>
+    <div class="meta">us-central1 · autoscale 0→10 · 4 GiB / 2 vCPU · FastAPI + uvicorn (Python 3.12) · 6 voice WebSocket endpoints + 125+ REST endpoints</div>
+  </div>
+
+  <!-- ADK orchestrator (center, the brain) -->
+  <div class="box brand-strong" style="top: 545px; left: 530px; width: 460px; padding: 20px 24px;">
+    <div class="label">Multi-agent orchestration</div>
+    <div class="title">Google Agent Development Kit (ADK)</div>
+    <div class="meta">Root orchestrator + 12 sub-agents · 49 production tools (48 custom + Google Search) · ADK Sessions + Memory Bank · 88-file persona canon validated at boot</div>
+    <div class="pillrow" style="margin-top:10px;">
+      <span class="pill">Companion</span>
+      <span class="pill">Medication</span>
+      <span class="pill">Memory</span>
+      <span class="pill">Mirror</span>
+      <span class="pill">Alert</span>
+      <span class="pill">Family</span>
+      <span class="pill">Recipe</span>
+      <span class="pill">+5 more</span>
+    </div>
+  </div>
+
+  <!-- Cloud Storage (left, sage) -->
+  <div class="box sage" style="top: 555px; left: 100px; width: 200px;">
+    <div class="label">Storage · GCP</div>
+    <div class="title">Cloud Storage</div>
+    <div class="meta">Elder photos · nurse CV uploads · doc vault · V4 signed PUT</div>
+  </div>
+
+  <!-- Firestore (right, sage) -->
+  <div class="box sage" style="top: 555px; left: 1280px; width: 230px;">
+    <div class="label">Persistence · GCP</div>
+    <div class="title">Cloud Firestore</div>
+    <div class="meta">15+ collections · 10+ Pydantic models · checked-in composite-index catalog</div>
+  </div>
+
+  <!-- 3 intelligences row -->
+  <div class="box brand" style="top: 720px; left: 100px; width: 240px;">
+    <div class="label">Voice intelligence</div>
+    <div class="title">Gemini 3.1 Flash Live</div>
+    <div class="meta">WebSocket · native audio streaming · tool calling inside the live turn · 6 production persona endpoints</div>
+  </div>
+
+  <div class="box brand" style="top: 720px; left: 640px; width: 240px;">
+    <div class="label">Text intelligence</div>
+    <div class="title">Gemini 3 Flash</div>
+    <div class="meta">Memory extraction · daily caregiver summaries · recipe generation · session debrief</div>
+  </div>
+
+  <div class="box brand" style="top: 720px; left: 1180px; width: 240px;">
+    <div class="label">Vision intelligence</div>
+    <div class="title">Gemini Vision Flash</div>
+    <div class="meta">Elder Mirror mode (device camera Q&amp;A) · nurse document parsing at signup</div>
+  </div>
+
+  <!-- Grounding + Observability (smaller, indigo) -->
+  <div class="box indigo" style="top: 875px; left: 270px; width: 220px; padding: 10px 16px;">
+    <div class="label" style="margin-bottom:3px;">Grounding</div>
+    <div class="title" style="font-size:15px;">Google Search (Gemini Live tools)</div>
+    <div class="meta" style="font-size:11px; margin-top:2px;">Current events, weather, regional news</div>
+  </div>
+
+  <div class="box indigo" style="top: 875px; left: 1100px; width: 230px; padding: 10px 16px;">
+    <div class="label" style="margin-bottom:3px;">Observability</div>
+    <div class="title" style="font-size:15px;">Cloud Logging · tool-call traces</div>
+    <div class="meta" style="font-size:11px; margin-top:2px;">[sid] Tool call · Tool result · ErrorBoundary client telemetry</div>
+  </div>
+
+  <!-- Footer / legend -->
+  <div class="footer">
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#C85A2E;color:#C85A2E;"></span> Gemini + ADK</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#4F7968;color:#4F7968;"></span> Persistence</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#5B437A;color:#5B437A;"></span> Grounding · Observability</span>
+    </div>
+    <div class="right">Sees. Hears. Remembers. Stays.</div>
+  </div>
+
+</div>
+</body>
+</html>
